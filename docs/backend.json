@@ -1,0 +1,161 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "User Profile",
+      "description": "Represents a user's public profile.",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "The user's display name."
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "The user's email address."
+        },
+        "role": {
+          "type": "string",
+          "description": "The user's role, e.g., 'user' or 'admin'.",
+          "enum": [
+            "user",
+            "admin"
+          ]
+        }
+      },
+      "required": [
+        "displayName",
+        "email",
+        "role"
+      ]
+    },
+    "Article": {
+      "title": "Article",
+      "description": "Represents a newsletter article.",
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "The title of the article."
+        },
+        "excerpt": {
+          "type": "string",
+          "description": "A short summary or excerpt of the article."
+        },
+        "content": {
+          "type": "string",
+          "description": "The full content of the article in Markdown format."
+        },
+        "author": {
+          "type": "string",
+          "description": "The name of the article's author."
+        },
+        "authorId": {
+          "type": "string",
+          "description": "The UID of the article's author."
+        },
+        "authorAvatar": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "hint": {
+              "type": "string"
+            }
+          }
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The publication date of the article."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the article.",
+          "enum": [
+            "AI",
+            "Big Data",
+            "Machine Learning",
+            "Technology",
+            "Data Visualization"
+          ]
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "A list of tags associated with the article."
+        },
+        "image": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string"
+            },
+            "hint": {
+              "type": "string"
+            }
+          }
+        },
+        "featured": {
+          "type": "boolean",
+          "description": "Whether the article is featured."
+        }
+      },
+      "required": [
+        "title",
+        "excerpt",
+        "content",
+        "author",
+        "authorId",
+        "date",
+        "category",
+        "tags",
+        "image",
+        "featured"
+      ]
+    },
+    "Bookmark": {
+      "title": "Bookmark",
+      "description": "Represents a user's bookmarked article reference.",
+      "type": "object",
+      "properties": {
+        "bookmarkedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the article was bookmarked."
+        }
+      },
+      "required": [
+        "bookmarkedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password"
+    ]
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "Stores public information about a user."
+    },
+    "/articles/{articleId}": {
+      "schema": {
+        "$ref": "#/entities/Article"
+      },
+      "description": "Stores the articles for the newsletter."
+    },
+    "/users/{userId}/bookmarks/{articleId}": {
+      "schema": {
+        "$ref": "#/entities/Bookmark"
+      },
+      "description": "Stores a user's bookmarked articles. The document ID is the articleId."
+    }
+  }
+}

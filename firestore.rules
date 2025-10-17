@@ -1,0 +1,94 @@
+/**
+ * @file Firestore Security Rules
+ * @description This ruleset enforces a user-ownership model for user profiles and bookmarks,
+ *              while allowing public read access to articles with owner-only write access.
+ *
+ * Data Structure:
+ * - /users/{userId}: Stores public user profile information. Each user can only create, read, update,
+ *                    and delete their own profile.
+ * - /articles/{articleId}: Stores newsletter articles. Anyone can read articles, but only the article's
+ *                          author can create, update, or delete them.
+ * - /users/{userId}/bookmarks/{articleId}: Stores a user's bookmarked articles. Each user can only
+ *                                         manage their own bookmarks.
+ *
+ * Key Security Decisions:
+ * - User listing is disallowed to protect user privacy.
+ * - Articles are publicly readable, but writes are restricted to the article's author.
+ * - Default security posture for ambiguous relationships is strict owner-only access.
+ *
+ * Denormalization for Authorization:
+ * - The 'articles' collection requires each document to have an 'authorId' field
+ *   to enable author-only write access. This avoids costly 'get()' operations.
+ *
+ * Structural Segregation:
+ * - User profiles and articles are stored in separate top-level collections to reflect
+ *   their distinct access patterns (owner-only vs. public read).
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Secures user profiles. Each user can only manage their own profile.
+     * @path /users/{userId}
+     * @allow (create) - User '0jq0TG23w2hS5b3TnoEyzAZfOzY2' can create their own profile with matching userId.
+     * @allow (get, update, delete) - User '0jq0TG23w2hS5b3TnoEyzAZfOzY2' can get, update, and delete their own profile.
+     * @deny (create) - User 'differentUserId' cannot create a profile with userId '0jq0TG23w2hS5b3TnoEyzAZfOzY2'.
+     * @deny (get, update, delete) - User 'differentUserId' cannot get, update, and delete the profile of '0jq0TG23w2hS5b3TnoEyzAZfOzY2'.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if false; // User listing is not allowed.
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.email == request.auth.token.email;
+      allow update: if isSignedIn() && isExistingOwner(userId) && request.resource.data.email == resource.data.email;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    /**
+     * @description Secures newsletter articles. Anyone can read, but only the author can create, update, or delete.
+     * @path /articles/{articleId}
+     * @allow (get, list) - Any user can read articles.
+     * @allow (create) - User with authorId 'user123' can create a new article if request.auth.uid matches.
+     * @allow (update, delete) - User with authorId 'user123' can update or delete their article.
+     * @deny (create) - User with authorId 'user456' cannot create an article with authorId 'user123'.
+     * @deny (update, delete) - User with authorId 'user456' cannot update or delete an article owned by authorId 'user123'.
+     * @principle Allows public read access but enforces document ownership for writes.
+     */
+    match /articles/{articleId} {
+      allow get, list: if true;
+      allow create: if isSignedIn() && request.resource.data.authorId == request.auth.uid;
+      allow update: if isSignedIn() && isExistingOwner(resource.data.authorId);
+      allow delete: if isSignedIn() && isExistingOwner(resource.data.authorId);
+    }
+
+    /**
+     * @description Secures user bookmarks. Each user can only manage their own bookmarks.
+     * @path /users/{userId}/bookmarks/{articleId}
+     * @allow (create, get, update, delete) - User 'user123' can manage their own bookmarks.
+     * @allow (list) - User 'user123' can list their own bookmarks.
+     * @deny (create, get, update, delete, list) - User 'user456' cannot access the bookmarks of user 'user123'.
+     * @principle Restricts access to a user's own data tree.
+     */
+    match /users/{userId}/bookmarks/{articleId} {
+      allow get: if isSignedIn() && isOwner(userId);
+      allow list: if isSignedIn() && isOwner(userId);
+      allow create: if isSignedIn() && isOwner(userId);
+      allow update: if isSignedIn() && isExistingOwner(userId);
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isExistingOwner(ownerId) {
+      return isSignedIn() && request.auth.uid == ownerId && resource != null;
+    }
+  }
+}

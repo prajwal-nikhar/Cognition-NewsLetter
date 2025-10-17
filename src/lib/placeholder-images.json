@@ -1,0 +1,76 @@
+{
+  "placeholderImages": [
+    {
+      "id": "1",
+      "description": "Article image about AI and statistics",
+      "imageUrl": "https://picsum.photos/seed/article1/600/400",
+      "imageHint": "abstract data"
+    },
+    {
+      "id": "2",
+      "description": "Article image about big data challenges",
+      "imageUrl": "https://picsum.photos/seed/article2/600/400",
+      "imageHint": "server room"
+    },
+    {
+      "id": "3",
+      "description": "Article image about machine learning models",
+      "imageUrl": "https://picsum.photos/seed/article3/600/400",
+      "imageHint": "neural network"
+    },
+    {
+      "id": "4",
+      "description": "Article image about quantum computing",
+      "imageUrl": "https://picsum.photos/seed/article4/600/400",
+      "imageHint": "quantum computer"
+    },
+    {
+      "id": "5",
+      "description": "Article image about data ethics",
+      "imageUrl": "https://picsum.photos/seed/article5/600/400",
+      "imageHint": "balanced scales"
+    },
+    {
+      "id": "6",
+      "description": "Article image about data visualization",
+      "imageUrl": "https://picsum.photos/seed/article6/600/400",
+      "imageHint": "data charts"
+    },
+    {
+      "id": "avatar1",
+      "description": "Author avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar1/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar2",
+      "description": "Author avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar2/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar3",
+      "description": "Author avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar3/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar4",
+      "description": "Author avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar4/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar5",
+      "description": "Author avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar5/40/40",
+      "imageHint": "person portrait"
+    },
+    {
+      "id": "avatar6",
+      "description": "Author avatar",
+      "imageUrl": "https://picsum.photos/seed/avatar6/40/40",
+      "imageHint": "person portrait"
+    }
+  ]
+}
